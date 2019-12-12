@@ -1,0 +1,2 @@
+include ':app', ':attachment', ':cbo_utils-release', ':imagesynclib', ':retrofitwrapperlib'
+rootProject.name='ImageSync'
