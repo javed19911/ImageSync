@@ -14,12 +14,16 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.imagesync.Utils.MyImageView;
+import com.example.imagesynclib.Database.Local.Converters;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
 
     MyImageView attachment;
     Button sync;
+    BroadcastReceiver mReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        Converters.fromArrayLisr(new ArrayList<>(Arrays.asList("200")));
 
         new getFiles().execute();
 
@@ -98,6 +103,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        mReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Log.d("Reciever"," onRecieve"); //do something with intent
+                Toast.makeText(MainActivity.this,intent.getStringExtra("data"),Toast.LENGTH_LONG).show();
+            }
+        };
         LocalBroadcastManager.getInstance(MainActivity.this)
                 .registerReceiver(mReceiver, BackgroundImageUpload.getIntentFilter());
     }
@@ -112,14 +124,6 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
     }
 
-
-    BroadcastReceiver mReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d("Reciever"," onRecieve"); //do something with intent
-            Toast.makeText(MainActivity.this,intent.getStringExtra("data"),Toast.LENGTH_LONG).show();
-        }
-    };
 
     protected void onActivityResult(int reqcode, int rescode, Intent iob) {
 

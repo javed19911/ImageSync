@@ -1,8 +1,11 @@
 package com.example.imagesynclib;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.job.JobParameters;
 import android.app.job.JobService;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.util.Log;
 
 import com.example.imagesynclib.Database.Local.AppDatabase;
@@ -37,6 +40,9 @@ public class SyncImageJob extends JobService {
         //doIt.cancel(true);
         return true;
     }
+
+
+
 
     private class DoItTask extends AsyncTask<Void, Void, Boolean> {
         @Override

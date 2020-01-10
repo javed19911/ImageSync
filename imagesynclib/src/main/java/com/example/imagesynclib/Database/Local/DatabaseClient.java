@@ -17,7 +17,9 @@ public class DatabaseClient {
 
         //creating the app database with Room database builder
         //MyToDos is the name of the database
-        appDatabase = Room.databaseBuilder(mCtx, AppDatabase.class, "SyncImageDB").build();
+        appDatabase = Room.databaseBuilder(mCtx, AppDatabase.class, "SyncImageDB")
+                .addMigrations(MigrationDB.MIGRATION_1_2)
+                .build();
     }
 
     public static synchronized DatabaseClient getInstance(Context mCtx) {

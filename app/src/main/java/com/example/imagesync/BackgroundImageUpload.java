@@ -2,6 +2,8 @@ package com.example.imagesync;
 
 import com.example.imagesynclib.BackgroundImageUploader;
 
+import java.util.ArrayList;
+
 public class BackgroundImageUpload extends BackgroundImageUploader<mSync> {
     @Override
     public String getUrl() {
@@ -11,5 +13,12 @@ public class BackgroundImageUpload extends BackgroundImageUploader<mSync> {
     @Override
     public int NoOfRetry() {
         return 2;
+    }
+
+    @Override
+    public ArrayList<String> allowedStatusCodes() {
+        ArrayList<String> statusCodes = new ArrayList<>();
+        statusCodes.add("200");
+        return statusCodes;
     }
 }

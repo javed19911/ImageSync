@@ -4,6 +4,10 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
+
 
 @Entity(tableName = "GENERIC")
 public class mGeneric {
@@ -14,6 +18,19 @@ public class mGeneric {
 
     @ColumnInfo(name = "no_of_retry")
     private int no_of_retry=0;
+
+    @ColumnInfo(name = "group_id")
+    private int group_id= Integer.MAX_VALUE;
+
+    @ColumnInfo(name = "group_priority")
+    private int group_priority= Integer.MAX_VALUE;
+
+    @ColumnInfo(name = "item_priority")
+    private int item_priority= Integer.MAX_VALUE;
+
+    @ColumnInfo(name = "allowed_success_code")
+    private ArrayList<String> allowed_success_code =  new ArrayList<>(Arrays.asList("200"));
+
 
     @ColumnInfo(name = "no_retryed")
     private int no_retryed=0;
@@ -67,6 +84,21 @@ public class mGeneric {
         return no_retryed;
     }
 
+    public int getGroup_id() {
+        return group_id;
+    }
+
+    public int getGroup_priority() {
+        return group_priority;
+    }
+
+    public int getItem_priority() {
+        return item_priority;
+    }
+
+    public ArrayList<String> getAllowed_success_code() {
+        return allowed_success_code;
+    }
 
     ///setter
 
@@ -107,5 +139,21 @@ public class mGeneric {
 
     public void setNo_retryed(int no_retryed) {
         this.no_retryed = no_retryed;
+    }
+
+    public void setGroup_id(int group_id) {
+        this.group_id = group_id;
+    }
+
+    public void setGroup_priority(int group_priority) {
+        this.group_priority = group_priority;
+    }
+
+    public void setItem_priority(int item_priority) {
+        this.item_priority = item_priority;
+    }
+
+    public void setAllowed_success_code(ArrayList<String> allowed_success_code) {
+        this.allowed_success_code = allowed_success_code;
     }
 }

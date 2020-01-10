@@ -62,18 +62,24 @@ public class UploadService {
             try {
                 JSONObject object1 = new JSONObject(response);
 
+                /*if (generic.getAllowed_success_code().size() == 0){
+                    generic.getAllowed_success_code().add("200");
+                }*/
+
                 if (object1.has("result")){
                     object1 = object1.getJSONObject("result");
                 }
                 if (object1.has("status_code")){
-                    if (object1.getInt("status_code") == 200 ||
+                    if (/*generic.getAllowed_success_code().contains(object1.getString("status_code") )*/
+                            object1.getInt("status_code") == 200 ||
                         generic.getNo_retryed() >= generic.getNo_of_retry()){
                         database.genericDao().delete(generic);
                     }else{
                         database.genericDao().update(generic.setRetryed(generic.getNo_retryed()+1));
                     }
 
-                    if (object1.getInt("status_code") == 200){
+                    if (/*generic.getAllowed_success_code().contains(object1.getString("status_code") )*/
+                            object1.getInt("status_code") == 200  ){
                         Intent intent = new Intent(BackgroundImageUploader.getAction());
                         intent.putExtra("data", generic.getJsonStr());
                         intent.putExtra("response", response);
@@ -86,7 +92,13 @@ public class UploadService {
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
-                database.genericDao().update(generic.setRetryed(generic.getNo_retryed()+1));
+
+                if (generic.getNo_retryed() >= generic.getNo_of_retry()){
+                    database.genericDao().delete(generic);
+                }else{
+                    database.genericDao().update(generic.setRetryed(generic.getNo_retryed()+1));
+                }
+                //database.genericDao().update(generic.setRetryed(generic.getNo_retryed()+1));
             }
 
 

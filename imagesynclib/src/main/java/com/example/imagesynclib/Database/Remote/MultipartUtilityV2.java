@@ -79,11 +79,11 @@ class MultipartUtilityV2 {
         request.writeBytes(this.crlf);
 
         byte[] bytes = new byte[0];
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            bytes = Files.readAllBytes(uploadFile.toPath());
-        }else{
+//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+//            bytes = Files.readAllBytes(uploadFile.toPath());
+//        }else{
             bytes = FileToArrayOfBytes.readBytesFromFile(uploadFile);
-        }
+//        }
         request.write(bytes);
 
     }
