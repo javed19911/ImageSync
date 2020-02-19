@@ -85,7 +85,8 @@ class MultipartUtilityV2 {
             bytes = FileToArrayOfBytes.readBytesFromFile(uploadFile);
 //        }
         request.write(bytes);
-
+        request.writeBytes(this.crlf);
+        request.flush();
     }
 
 

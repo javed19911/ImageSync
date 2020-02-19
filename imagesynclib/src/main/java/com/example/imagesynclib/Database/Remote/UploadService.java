@@ -25,87 +25,94 @@ public class UploadService {
     private MultipartUtilityV2 multipartUtilityV2;
     //private MultipartUtility multipartUtility;
 
-    public UploadService(Context context, mGeneric generic) throws IOException  {
+    public UploadService(Context context, mGeneric generic) throws IOException {
         multipartUtilityV2 = new MultipartUtilityV2(generic.getUrl());
 
         Gson gson = new Gson();
-        JsonObject object = gson.fromJson(generic.getJsonStr(),JsonObject.class);
+        JsonObject object = gson.fromJson(generic.getJsonStr(), JsonObject.class);
 //        Log.d("UploadService", "url : "+ url);
-        for (String key : object.keySet()){
+        for (String key : object.keySet()) {
 //            Log.d("UploadService", "key : "+ key);
 
             String file = object.get(key).getAsString();
 
 //            Log.d("UploadService", "value : "+ file);
 
-            if (!new File(file).exists()){
-                multipartUtilityV2.addFormField(key,object.get(key).getAsString());
+            if (!new File(file).exists()) {
+                multipartUtilityV2.addFormField(key, object.get(key).getAsString());
             }
         }
 
+        int imageCount = 0;
 
-        for (String key : object.keySet()){
+        for (String key : object.keySet()) {
 //            Log.d("UploadService", "key : "+ key);
 
             String file = object.get(key).getAsString();
 
 //            Log.d("UploadService", "value : "+ file);
 
-            if (new File(file).exists()){
-                multipartUtilityV2.addFilePart(key,new File(file));
+            if (new File(file).exists()) {
+                multipartUtilityV2.addFilePart(key, new File(file));
+                imageCount++;
             }
         }
-        String response = multipartUtilityV2.finish();
 
-        if (!response.isEmpty()) {
-            AppDatabase database = DatabaseClient.getInstance(context).getAppDatabase();
-            try {
-                JSONObject object1 = new JSONObject(response);
+        AppDatabase database = DatabaseClient.getInstance(context).getAppDatabase();
+
+
+        if (imageCount > 0) {
+            String response = multipartUtilityV2.finish();
+
+
+            if (!response.isEmpty()) {
+
+                try {
+                    JSONObject object1 = new JSONObject(response);
 
                 /*if (generic.getAllowed_success_code().size() == 0){
                     generic.getAllowed_success_code().add("200");
                 }*/
 
-                if (object1.has("result")){
-                    object1 = object1.getJSONObject("result");
-                }
-                if (object1.has("status_code")){
-                    if (/*generic.getAllowed_success_code().contains(object1.getString("status_code") )*/
-                            object1.getInt("status_code") == 200 ||
-                        generic.getNo_retryed() >= generic.getNo_of_retry()){
+                    if (object1.has("result")) {
+                        object1 = object1.getJSONObject("result");
+                    }
+                    if (object1.has("status_code")) {
+                        if (generic.getAllowed_success_code().contains(object1.getString("status_code")) ||
+                                /*object1.getInt("status_code") == 200 ||*/
+                                generic.getNo_retryed() >= generic.getNo_of_retry()) {
+                            database.genericDao().delete(generic);
+                        } else {
+                            database.genericDao().update(generic.setRetryed(generic.getNo_retryed() + 1));
+                        }
+
+                        if (generic.getAllowed_success_code().contains(object1.getString("status_code"))
+                            /*object1.getInt("status_code") == 200 */) {
+                            Intent intent = new Intent(BackgroundImageUploader.getAction());
+                            intent.putExtra("data", generic.getJsonStr());
+                            intent.putExtra("response", response);
+                            LocalBroadcastManager.getInstance(context).
+                                    sendBroadcast(intent);
+                        }
+
+                    } else {
                         database.genericDao().delete(generic);
-                    }else{
-                        database.genericDao().update(generic.setRetryed(generic.getNo_retryed()+1));
                     }
+                } catch (JSONException e) {
+                    e.printStackTrace();
 
-                    if (/*generic.getAllowed_success_code().contains(object1.getString("status_code") )*/
-                            object1.getInt("status_code") == 200  ){
-                        Intent intent = new Intent(BackgroundImageUploader.getAction());
-                        intent.putExtra("data", generic.getJsonStr());
-                        intent.putExtra("response", response);
-                        LocalBroadcastManager.getInstance(context).
-                                sendBroadcast(intent);
+                    if (generic.getNo_retryed() >= generic.getNo_of_retry()) {
+                        database.genericDao().delete(generic);
+                    } else {
+                        database.genericDao().update(generic.setRetryed(generic.getNo_retryed() + 1));
                     }
-
-                }else{
-                    database.genericDao().delete(generic);
+                    //database.genericDao().update(generic.setRetryed(generic.getNo_retryed()+1));
                 }
-            } catch (JSONException e) {
-                e.printStackTrace();
 
-                if (generic.getNo_retryed() >= generic.getNo_of_retry()){
-                    database.genericDao().delete(generic);
-                }else{
-                    database.genericDao().update(generic.setRetryed(generic.getNo_retryed()+1));
-                }
-                //database.genericDao().update(generic.setRetryed(generic.getNo_retryed()+1));
+
             }
-
-
-
-
-
-
+        }else{
+            database.genericDao().delete(generic);
         }
 
     }
